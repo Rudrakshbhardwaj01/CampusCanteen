@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusCanteen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        dark: '#2D3436',
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'typing': 'typing 3.5s steps(40, end)',
+                        'slide-in': 'slideIn 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        typing: {
+                            'from': { width: '0' },
+                            'to': { width: '100%' },
+                        },
+                        slideIn: {
+                            'from': { transform: 'translateX(100%)' },
+                            'to': { transform: 'translateX(0)' },
+                        },
+                        fadeIn: {
+                            'from': { opacity: '0' },
+                            'to': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glassmorphism {
+                @apply bg-white/10 backdrop-blur-lg border border-white/20;
+            }
+            .neon-glow {
+                @apply shadow-[0_0_15px_rgba(255,107,107,0.5)];
+            }
+            .carousel-container {
+                scroll-behavior: smooth;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+                scroll-snap-type: x mandatory;
+            }
+            .carousel-container::-webkit-scrollbar {
+                display: none;
+            }
+            .floating {
+                animation: float 6s ease-in-out infinite;
+            }
+            .floating-delay-1 {
+                animation-delay: 1s;
+            }
+            .floating-delay-2 {
+                animation-delay: 2s;
+            }
+            .floating-delay-3 {
+                animation-delay: 3s;
+            }
+            .blob {
+                animation: blob 7s infinite;
+            }
+            .blob-delay-1 {
+                animation-delay: 1s;
+            }
+            .blob-delay-2 {
+                animation-delay: 2s;
+            }
+            .testimonial-slide {
+                transition: all 0.5s ease-in-out;
+                opacity: 0;
+                transform: translateX(100%);
+                position: absolute;
+                width: 100%;
+                height: 100%;
+            }
+            .testimonial-slide.active {
+                opacity: 1;
+                transform: translateX(0);
+                z-index: 1;
+            }
+            @keyframes blob {
+                0% { transform: translate(0px, 0px) scale(1); }
+                33% { transform: translate(30px, -50px) scale(1.1); }
+                66% { transform: translate(-20px, 20px) scale(0.9); }
+                100% { transform: translate(0px, 0px) scale(1); }
+            }
+            /* Custom scrollbar styling */
+            .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(255, 107, 107, 0.5) rgba(0, 0, 0, 0.1);
+            }
+            .custom-scrollbar::-webkit-scrollbar {
+                height: 8px;
+                width: 8px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.1);
+                border-radius: 4px;
+                margin: 0 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(255, 107, 107, 0.5);
+                border-radius: 4px;
+                border: 2px solid transparent;
+                background-clip: padding-box;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 107, 107, 0.7);
+                border: 2px solid transparent;
+                background-clip: padding-box;
+            }
+            .dark .custom-scrollbar::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(255, 107, 107, 0.3);
+                border: 2px solid transparent;
+                background-clip: padding-box;
+            }
+            .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 107, 107, 0.5);
+                border: 2px solid transparent;
+                background-clip: padding-box;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-dark transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glassmorphism">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl font-bold text-primary">🍽️</span>
+                    <span class="text-xl font-bold text-gray-800 dark:text-white">CampusCanteen</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-800 dark:text-white hover:text-primary transition-colors">Home</a>
+                    <a href="#menu" class="text-gray-800 dark:text-white hover:text-primary transition-colors">Menu</a>
+                    <a href="#orders" class="text-gray-800 dark:text-white hover:text-primary transition-colors">My Orders</a>
+                    <a href="#about" class="text-gray-800 dark:text-white hover:text-primary transition-colors">About</a>
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <span class="dark:hidden">🌙</span>
+                        <span class="hidden dark:inline">☀️</span>
+                    </button>
+                    <!-- Cart Button -->
+                    <button id="cartButton" class="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <span class="text-2xl">🛒</span>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2" id="mobileMenuBtn">
+                    <svg class="w-6 h-6 text-gray-800 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-800">
+            <div class="px-4 py-2 space-y-2">
+                <a href="#" class="block text-gray-800 dark:text-white hover:text-primary transition-colors">Home</a>
+                <a href="#menu" class="block text-gray-800 dark:text-white hover:text-primary transition-colors">Menu</a>
+                <a href="#orders" class="block text-gray-800 dark:text-white hover:text-primary transition-colors">My Orders</a>
+                <a href="#about" class="block text-gray-800 dark:text-white hover:text-primary transition-colors">About</a>
+                <button id="mobileThemeToggle" class="w-full text-left text-gray-800 dark:text-white hover:text-primary transition-colors">
+                    Toggle Theme
+                </button>
+                <button id="mobileCartButton" class="w-full text-left text-gray-800 dark:text-white hover:text-primary transition-colors">
+                    Cart (<span id="mobileCartCount">0</span>)
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center px-4 pt-16 relative overflow-hidden">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 animate-gradient"></div>
+        
+        <!-- Animated Blobs -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="blob absolute top-1/4 left-1/4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-xl"></div>
+            <div class="blob blob-delay-1 absolute top-1/3 right-1/4 w-72 h-72 bg-secondary/20 rounded-full mix-blend-multiply filter blur-xl"></div>
+            <div class="blob blob-delay-2 absolute bottom-1/4 left-1/3 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-xl"></div>
+        </div>
+
+        <!-- Floating Food Icons -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <span class="floating absolute top-1/4 left-1/4 text-4xl">🍕</span>
+            <span class="floating floating-delay-1 absolute top-1/3 right-1/4 text-4xl">☕</span>
+            <span class="floating floating-delay-2 absolute bottom-1/4 left-1/3 text-4xl">🥪</span>
+            <span class="floating floating-delay-3 absolute top-1/2 right-1/3 text-4xl">🍔</span>
+            <span class="floating absolute bottom-1/3 left-1/2 text-4xl">🥗</span>
+            <span class="floating floating-delay-1 absolute top-1/4 right-1/2 text-4xl">🍦</span>
+        </div>
+        
+        <div class="text-center space-y-6 relative z-10">
+            <div class="animate-float">
+                <span class="text-6xl">🍽️</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 dark:text-white">
+                CampusCanteen
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 overflow-hidden whitespace-nowrap animate-typing">
+                Skip the line. Order anytime. CampusCanteen makes it easy.
+            </p>
+            <a href="#menu" class="inline-block px-8 py-3 bg-primary text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
+                Browse Menu
+            </a>
+
+            <!-- Testimonial Carousel -->
+            <div class="mt-16 max-w-5xl mx-auto">
+                <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">What Our Users Say</h2>
+                <div class="relative">
+                    <!-- Testimonial Slides -->
+                    <div id="testimonialSlides" class="relative h-64">
+                        <div class="testimonial-slide active absolute inset-0">
+                            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300">
+                                <div class="flex items-center space-x-4 mb-6">
+                                    <span class="text-5xl">🍳</span>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Early Bird Special</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Breakfast made easy</p>
+                                    </div>
+                                </div>
+                                <p class="text-lg text-gray-600 dark:text-gray-300 italic mb-4">
+                                    "CampusCanteen saved me from 8am hangriness! Now I can order my breakfast while walking to class."
+                                </p>
+                                <p class="text-right text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    - Priya, Engineering
+                                </p>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide absolute inset-0">
+                            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300">
+                                <div class="flex items-center space-x-4 mb-6">
+                                    <span class="text-5xl">🌮</span>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Quick & Easy</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">No more waiting</p>
+                                    </div>
+                                </div>
+                                <p class="text-lg text-gray-600 dark:text-gray-300 italic mb-4">
+                                    "No more lines. I love this! The app is so intuitive and the food is always ready when I arrive."
+                                </p>
+                                <p class="text-right text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    - Rahul, Business
+                                </p>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide absolute inset-0">
+                            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300">
+                                <div class="flex items-center space-x-4 mb-6">
+                                    <span class="text-5xl">🍕</span>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Amazing Experience</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">UI & Food lover</p>
+                                    </div>
+                                </div>
+                                <p class="text-lg text-gray-600 dark:text-gray-300 italic mb-4">
+                                    "The UI is 🔥 and the food even better. It's like they read my mind when designing this app!"
+                                </p>
+                                <p class="text-right text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    - Aanya, Design
+                                </p>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide absolute inset-0">
+                            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300">
+                                <div class="flex items-center space-x-4 mb-6">
+                                    <span class="text-5xl">🥤</span>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Best Hackathon Idea</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Innovation at its best</p>
+                                    </div>
+                                </div>
+                                <p class="text-lg text-gray-600 dark:text-gray-300 italic mb-4">
+                                    "Best hackathon idea ever. This solves a real problem for students!"
+                                </p>
+                                <p class="text-right text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    - Rohan, Computer Science
+                                </p>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide absolute inset-0">
+                            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300">
+                                <div class="flex items-center space-x-4 mb-6">
+                                    <span class="text-5xl">🍝</span>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Zomato for Campus</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Food delivery reimagined</p>
+                                    </div>
+                                </div>
+                                <p class="text-lg text-gray-600 dark:text-gray-300 italic mb-4">
+                                    "Felt like Zomato for campus. The interface is so clean and the food arrives hot!"
+                                </p>
+                                <p class="text-right text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    - Neha, Marketing
+                                </p>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide absolute inset-0">
+                            <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300">
+                                <div class="flex items-center space-x-4 mb-6">
+                                    <span class="text-5xl">🧊</span>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Refreshing Experience</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Cool drinks, hot food</p>
+                                    </div>
+                                </div>
+                                <p class="text-lg text-gray-600 dark:text-gray-300 italic mb-4">
+                                    "Love the iced tea and fast checkout! Makes my lunch breaks so much better."
+                                </p>
+                                <p class="text-right text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    - Arjun, Physics
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <button id="prevTestimonial" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 bg-white/90 dark:bg-gray-800/90 p-4 rounded-full shadow-lg hover:scale-110 transition-all backdrop-blur-sm">
+                        <span class="text-2xl text-gray-800 dark:text-white">←</span>
+                    </button>
+                    <button id="nextTestimonial" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 bg-white/90 dark:bg-gray-800/90 p-4 rounded-full shadow-lg hover:scale-110 transition-all backdrop-blur-sm">
+                        <span class="text-2xl text-gray-800 dark:text-white">→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-20 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Our Menu</h2>
+            
+            <!-- Search and Filters -->
+            <div class="mb-8 space-y-4">
+                <!-- Search Bar -->
+                <div class="max-w-xl mx-auto">
+                    <div class="relative">
+                        <input type="text" id="menuSearch" placeholder="Search menu items..." 
+                            class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            🔍
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex flex-wrap justify-center gap-4">
+                    <div class="flex items-center space-x-2">
+                        <label class="text-gray-600 dark:text-gray-300">Price Range:</label>
+                        <select id="priceFilter" class="px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white">
+                            <option value="all">All Prices</option>
+                            <option value="0-5">$0 - $5</option>
+                            <option value="5-10">$5 - $10</option>
+                            <option value="10+">$10+</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label class="text-gray-600 dark:text-gray-300">Dietary:</label>
+                        <select id="dietaryFilter" class="px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white">
+                            <option value="all">All Items</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="non-vegetarian">Non-Vegetarian</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button class="filter-btn active bg-primary text-white px-6 py-2 rounded-full hover:shadow-lg transition-all">
+                    All
+                </button>
+                <button class="filter-btn bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-6 py-2 rounded-full hover:shadow-lg transition-all">
+                    Main Course
+                </button>
+                <button class="filter-btn bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-6 py-2 rounded-full hover:shadow-lg transition-all">
+                    Snacks
+                </button>
+                <button class="filter-btn bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-6 py-2 rounded-full hover:shadow-lg transition-all">
+                    Beverages
+                </button>
+            </div>
+
+            <!-- Menu Carousel -->
+            <div class="carousel-container custom-scrollbar flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-6 pb-4">
+                <!-- Menu items will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- My Orders Section -->
+    <section id="orders" class="py-20 px-4 bg-gray-100 dark:bg-gray-900">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">My Orders</h2>
+            <div id="ordersList" class="space-y-4">
+                <!-- Orders will be dynamically added here -->
+            </div>
+            <div id="noOrders" class="text-center py-12 hidden">
+                <p class="text-xl text-gray-600 dark:text-gray-300 mb-4">No orders placed yet. Go ahead and treat yourself!</p>
+                <a href="#menu" class="inline-block px-6 py-2 bg-primary text-white rounded-full hover:shadow-lg transition-all">
+                    Browse Menu
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4">
+        <div class="container mx-auto max-w-3xl">
+            <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">About CampusCanteen</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-6">
+                <p class="text-gray-600 dark:text-gray-300">
+                    CampusCanteen revolutionizes the way students order food on campus. By eliminating long queues and providing a seamless ordering experience, we help you save time and enjoy your meals stress-free.
+                </p>
+                <div class="flex items-center justify-center space-x-4 text-2xl">
+                    <span>🚀</span>
+                    <span>💡</span>
+                    <span>🎓</span>
+                </div>
+                <p class="text-center text-gray-500 dark:text-gray-400">
+                    Built by Rudraksh Bhardwaj
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="fixed right-0 top-0 h-full w-96 bg-white dark:bg-gray-800 shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white">Your Cart</h3>
+                <button id="closeCart" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    ✕
+                </button>
+            </div>
+            <div id="cartItems" class="space-y-4 mb-6">
+                <!-- Cart items will be dynamically added here -->
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-600 dark:text-gray-300">Total:</span>
+                    <span id="cartTotal" class="text-xl font-bold text-primary">$0.00</span>
+                </div>
+                <button id="placeOrderBtn" class="w-full py-3 bg-primary text-white rounded-full hover:shadow-lg transition-all">
+                    Place Order
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full transition-transform duration-300">
+        <!-- Toast content will be dynamically added here -->
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-4 left-4 bg-primary text-white p-3 rounded-full shadow-lg opacity-0 transition-opacity duration-300">
+        ↑
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html> 
