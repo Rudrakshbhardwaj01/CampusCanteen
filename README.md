@@ -1,6 +1,6 @@
 # 🍽️ CampusCanteen
 
-> 🚀 Built for **0x.DayHack** by **Rubraksh Bharbwag**  
+> 🚀 Built for **0x.DayHack** by **Rudraksh Bhardwaj**  
 > 🎯 A vibrant, UI-heavy, and completely frontend-driven food-ordering web experience designed for college cafeterias.
 
 ## 📢 Project Description
