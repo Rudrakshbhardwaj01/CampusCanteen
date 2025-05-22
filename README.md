@@ -49,7 +49,7 @@ Deployed via **GitHub Pages** with **modular protected structures** across `inde
 
 ## 🌐 Live Demo
   
-
+https://rudrakshbhardwaj01.github.io/CampusCanteen/
 
 ## 🧠 Tech Stack
 
