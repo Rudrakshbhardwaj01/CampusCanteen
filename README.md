@@ -5,7 +5,7 @@
 
 ## 📢 Project Description
 
-Long queues. Lost time. Daily cafeteria chaos.  
+Long queues? Lost time? Daily cafeteria chaos?  
 **CampusCanteen** fixes that.
 
 This full-stack-simulation frontend project lets students:
